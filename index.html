@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+<title> Docs+</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: #f0f4f8;
+  color: #1a202c;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+.header {
+  background: linear-gradient(135deg, #1a365d, #2b6cb0);
+  color: white;
+  padding: 16px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.header h1 { font-size: 20px; font-weight: 700; }
+.header p  { font-size: 12px; opacity: .8; margin-top: 4px; }
+
+.main-content {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 12px 0 32px;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+.card-title {
+  font-size: 13px; font-weight: 700; color: #2d3748;
+  margin-bottom: 12px; text-transform: uppercase; letter-spacing: .5px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+
+.upload-btn {
+  display: flex; align-items: center; gap: 10px;
+  background: #ebf8ff; border: 2px dashed #90cdf4;
+  border-radius: 10px; padding: 14px; cursor: pointer;
+  width: 100%; margin-bottom: 10px; text-align: left;
+  transition: all .2s;
+}
+.upload-btn.success { background: #f0fff4; border-color: #68d391; }
+.upload-btn.loading { background: #fffbeb; border-color: #f6e05e; }
+.upload-btn:active { opacity: .8; }
+.upload-icon { font-size: 28px; flex-shrink: 0; }
+.upload-label { font-size: 14px; font-weight: 600; color: #2b6cb0; }
+.upload-sub { font-size: 11px; color: #718096; margin-top: 2px; }
+.upload-file { font-size: 11px; color: #38a169; font-weight: 600; margin-top: 2px; word-break: break-all; }
+
+.col-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.col-tag {
+  background: #ebf8ff; color: #2b6cb0; border: 1px solid #90cdf4;
+  border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 600;
+}
+.col-tag.matched { background: #f0fff4; color: #276749; border-color: #68d391; }
+
+.action-btn {
+  width: 100%; padding: 15px; border: none; border-radius: 12px;
+  font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 8px;
+}
+.action-btn.blue { background: linear-gradient(135deg, #2b6cb0, #1a365d); color: white; }
+.action-btn:disabled { background: #a0aec0; cursor: not-allowed; }
+
+.progress-wrap { margin-top: 12px; display: none; }
+.progress-bg { background: #e2e8f0; border-radius: 99px; height: 10px; overflow: hidden; }
+.progress-bar { height: 100%; background: linear-gradient(90deg, #2b6cb0, #48bb78); border-radius: 99px; width: 0%; transition: width .4s; }
+.progress-text { text-align: center; font-size: 12px; color: #4a5568; margin-top: 6px; }
+
+.analyse-wrap {
+  margin-top: 12px;
+  display: none;
+  background: #fffbeb;
+  border: 1px solid #f6e05e;
+  border-radius: 10px;
+  padding: 14px;
+}
+.analyse-wrap .progress-bg { background: #fefcbf; }
+.analyse-wrap .progress-bar {
+  background: linear-gradient(90deg, #d69e2e, #ecc94b);
+  width: 30%;
+  animation: analysePulse 1.2s ease-in-out infinite;
+}
+@keyframes analysePulse {
+  0%   { width: 20%; margin-left: 0; }
+  50%  { width: 60%; margin-left: 20%; }
+  100% { width: 20%; margin-left: 80%; }
+}
+.analyse-text {
+  text-align: center;
+  font-size: 13px;
+  color: #744210;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+.row-limit-warn {
+  display: none;
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: #fffbeb;
+  border: 1px solid #f6e05e;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #744210;
+  line-height: 1.45;
+}
+
+.limit-banner {
+  background: #ebf8ff;
+  border: 1px solid #90cdf4;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 12px;
+  font-size: 12px;
+  color: #2c5282;
+  line-height: 1.5;
+}
+.limit-banner b { display: block; margin-bottom: 4px; color: #1a365d; }
+
+.result-box { background: #f0fff4; border: 1px solid #68d391; border-radius: 8px; padding: 14px; margin-top: 12px; display: none; }
+.result-box p { font-size: 13px; color: #276749; font-weight: 600; }
+.result-box small { font-size: 11px; color: #4a5568; display: block; margin-top: 4px; }
+
+.info { font-size: 12px; color: #718096; margin-bottom: 10px; }
+.info.ready { color: #276749; font-weight: 600; }
+.error-box { background: #fff5f5; border: 1px solid #feb2b2; border-radius: 8px; padding: 12px; margin: 0 12px 12px; font-size: 12px; color: #c53030; display: none; }
+.wipe-btn { background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
+
+.note-box { background: #fffbeb; border: 1px solid #f6e05e; border-radius: 8px; padding: 12px; margin: 12px; font-size: 12px; color: #744210; }
+.note-box b { display: block; margin-bottom: 4px; }
+
+@media (min-width: 600px) {
+  .card, .note-box, .error-box, .limit-banner { margin-left: 24px; margin-right: 24px; }
+}
+@media (min-width: 900px) {
+  body { max-width: 960px; margin: 0 auto; }
+  .card, .note-box, .error-box, .limit-banner { margin-left: 32px; margin-right: 32px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📄 Docs+</h1>
+  <p>Excel + Word Template → Perfect Bulk Document</p>
+</div>
+
+<div class="main-content">
+
+  <div class="note-box">
+    <b>📌 Placeholder format: <code>{{COLUMN_NAME}}</code></b>
+    Use double curly braces in your Word template.<br>
+    Example: <code>{{NAME}}</code> <code>{{SALARY}}</code> <code>{{PHOTO}}</code>
+  </div>
+
+  <!-- Always-visible 50-row limit notice -->
+  <div class="limit-banner">
+    <b>⚠️ Row limit</b>
+    To keep the app stable on mobile, only the <b>first 50 data rows</b> of your Excel file are processed.
+    Extra rows are ignored.
+  </div>
+
+  <div class="card">
+    <div class="card-title">📁 Upload Files</div>
+    <button class="upload-btn" id="excelBtn" onclick="pickExcel()">
+      <span class="upload-icon">📊</span>
+      <div>
+        <div class="upload-label">Select Excel File</div>
+        <div class="upload-sub">.xlsx — column headers in row 1</div>
+        <div class="upload-file" id="excelName">No file selected</div>
+      </div>
+    </button>
+    <button class="upload-btn" id="wordBtn" onclick="pickWord()">
+      <span class="upload-icon">📝</span>
+      <div>
+        <div class="upload-label">Select Word Template</div>
+        <div class="upload-sub">.docx — use {{ColumnName}} placeholders</div>
+        <div class="upload-file" id="wordName">No file selected</div>
+      </div>
+    </button>
+
+    <div class="analyse-wrap" id="analyseWrap">
+      <div class="progress-bg"><div class="progress-bar"></div></div>
+      <div class="analyse-text">⏳ Analysing files… Please wait</div>
+    </div>
+  </div>
+
+  <div class="card" id="colCard" style="display:none">
+    <div class="card-title">🔍 Analysis</div>
+    <div style="font-size:11px;color:#718096;margin-bottom:8px">
+      <span style="color:#276749">●</span> Green = placeholder matched in Word &nbsp;
+      <span style="color:#2b6cb0">●</span> Blue = Excel column not in template
+    </div>
+    <div class="col-wrap" id="colTags"></div>
+    <div style="margin-top:10px;font-size:12px;color:#4a5568;font-weight:600" id="matchInfo"></div>
+    <div class="row-limit-warn" id="rowLimitWarn"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      ⚡ Generate
+      <button class="wipe-btn" onclick="confirmWipe()">🗑 Reset</button>
+    </div>
+    <div class="info" id="readyInfo">Upload both files to begin.</div>
+
+    <button class="action-btn blue" id="genBtn" disabled onclick="startGenerate()">
+      🚀 Generate All Documents
+    </button>
+
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-bg"><div class="progress-bar" id="progressBar"></div></div>
+      <div class="progress-text" id="progressText">Processing...</div>
+    </div>
+
+    <div class="result-box" id="resultBox">
+      <p id="resultMsg">✓ Done!</p>
+      <small id="resultPath"></small>
+      <small style="margin-top:6px;color:#276749">
+        Use the dialog to open the file, or find it in the app’s Documents folder.
+      </small>
+    </div>
+  </div>
+
+  <div class="error-box" id="errorBox"></div>
+
+</div>
+
+<script>
+const MAX_ROWS = 50;  // must match generator.py
+
+let excelReady = false;
+let wordReady  = false;
+let isGenerating = false;
+let isAnalysing  = false;
+
+function pickExcel(){ if(typeof AppBridge!=='undefined') AppBridge.pickExcelFile(); }
+function pickWord() { if(typeof AppBridge!=='undefined') AppBridge.pickWordFile();  }
+
+function onExcelReady(ok, uri) {
+  if(!ok){ showError('Failed to read Excel file'); return; }
+  const btn = document.getElementById('excelBtn');
+  const name = decodeURIComponent(uri.split('/').pop()).split('%2F').pop();
+  document.getElementById('excelName').textContent = `✓ ${name}`;
+  btn.classList.add('loading');
+  excelReady = true;
+  tryAnalyse();
+}
+
+function onWordReady(ok, uri) {
+  if(!ok){ showError('Failed to read Word file'); return; }
+  const btn = document.getElementById('wordBtn');
+  const name = decodeURIComponent(uri.split('/').pop()).split('%2F').pop();
+  document.getElementById('wordName').textContent = `✓ ${name}`;
+  btn.classList.add('loading');
+  wordReady = true;
+  tryAnalyse();
+}
+
+function tryAnalyse() {
+  if(!excelReady || !wordReady) return;
+  if(isAnalysing) return;
+  isAnalysing = true;
+
+  document.getElementById('analyseWrap').style.display = 'block';
+  document.getElementById('errorBox').style.display = 'none';
+  document.getElementById('rowLimitWarn').style.display = 'none';
+  document.getElementById('readyInfo').textContent = 'Analysing files… please wait';
+  document.getElementById('genBtn').disabled = true;
+
+  setTimeout(() => {
+    try {
+      const raw = AppBridge.analyseFiles();
+      const data = JSON.parse(raw);
+
+      document.getElementById('analyseWrap').style.display = 'none';
+      isAnalysing = false;
+
+      if(data.error){ showError(data.error); return; }
+
+      const cols    = data.columns;
+      const rows    = data.rows;
+      const holders = data.placeholders;
+
+      document.getElementById('excelName').textContent =
+        `✓ ${rows} rows, ${cols.length} columns`;
+      document.getElementById('excelBtn').classList.remove('loading');
+      document.getElementById('excelBtn').classList.add('success');
+
+      document.getElementById('wordBtn').classList.remove('loading');
+      document.getElementById('wordBtn').classList.add('success');
+
+      const wrap = document.getElementById('colTags');
+      wrap.innerHTML = '';
+      let matched = 0;
+      cols.forEach(col => {
+        const inWord = holders.indexOf(col) !== -1;
+        if(inWord) matched++;
+        const tag = document.createElement('span');
+        tag.className = 'col-tag' + (inWord ? ' matched' : '');
+        tag.textContent = '{{' + col + '}}';
+        wrap.appendChild(tag);
+      });
+
+      document.getElementById('colCard').style.display = 'block';
+
+      const willGenerate = Math.min(rows, MAX_ROWS);
+      document.getElementById('matchInfo').textContent =
+        `${matched} of ${cols.length} columns matched — ${willGenerate} document(s) will be generated`;
+
+      const warn = document.getElementById('rowLimitWarn');
+      if (rows > MAX_ROWS) {
+        warn.style.display = 'block';
+        warn.textContent =
+          `⚠️ This file has ${rows} rows. Only the first ${MAX_ROWS} will be generated.`;
+      } else {
+        warn.style.display = 'none';
+      }
+
+      const info = document.getElementById('readyInfo');
+      if (rows > MAX_ROWS) {
+        info.textContent = `✓ Ready — first ${MAX_ROWS} of ${rows} documents will be generated`;
+      } else {
+        info.textContent = `✓ Ready — ${rows} document(s) will be generated`;
+      }
+      info.className = 'info ready';
+      document.getElementById('genBtn').disabled = false;
+
+    } catch(e) {
+      document.getElementById('analyseWrap').style.display = 'none';
+      isAnalysing = false;
+      showError('Analysis error: '+e.message);
+    }
+  }, 100);
+}
+
+function startGenerate() {
+  if(isGenerating) return;
+  isGenerating = true;
+
+  document.getElementById('genBtn').disabled = true;
+  document.getElementById('progressWrap').style.display = 'block';
+  document.getElementById('resultBox').style.display = 'none';
+  document.getElementById('errorBox').style.display = 'none';
+
+  let fakeProgress = 0;
+  const timer = setInterval(() => {
+    fakeProgress = Math.min(fakeProgress + 2, 90);
+    document.getElementById('progressBar').style.width = fakeProgress + '%';
+    document.getElementById('progressText').textContent =
+      'Generating documents... ' + fakeProgress + '%';
+  }, 300);
+
+  setTimeout(() => {
+    try {
+      const result = AppBridge.generateDocx();
+      clearInterval(timer);
+
+      document.getElementById('progressBar').style.width = '100%';
+
+      if(result.startsWith('OK:')) {
+        const path = result.substring(3);
+        document.getElementById('progressText').textContent = '✓ Complete!';
+        document.getElementById('resultBox').style.display = 'block';
+        document.getElementById('resultMsg').textContent =
+          '✓ Document generated successfully!';
+        document.getElementById('resultPath').textContent =
+          'File: ' + path.split('/').pop();
+      } else {
+        const err = result.substring(6);
+        showError('Generation failed: ' + err);
+        document.getElementById('progressWrap').style.display = 'none';
+      }
+    } catch(e) {
+      clearInterval(timer);
+      showError('Error: ' + e.message);
+      document.getElementById('progressWrap').style.display = 'none';
+    }
+    document.getElementById('genBtn').disabled = false;
+    isGenerating = false;
+  }, 100);
+}
+
+function confirmWipe(){
+  if(confirm('Reset all files?')) {
+    if(typeof AppBridge!=='undefined') AppBridge.clearFiles();
+    excelReady = false; wordReady = false; isAnalysing = false;
+    ['excelBtn','wordBtn'].forEach(id => {
+      document.getElementById(id).classList.remove('success','loading');
+    });
+    document.getElementById('excelName').textContent = 'No file selected';
+    document.getElementById('wordName').textContent  = 'No file selected';
+    document.getElementById('colCard').style.display = 'none';
+    document.getElementById('progressWrap').style.display = 'none';
+    document.getElementById('analyseWrap').style.display = 'none';
+    document.getElementById('resultBox').style.display = 'none';
+    document.getElementById('errorBox').style.display = 'none';
+    document.getElementById('rowLimitWarn').style.display = 'none';
+    document.getElementById('genBtn').disabled = true;
+    const info = document.getElementById('readyInfo');
+    info.textContent = 'Upload both files to begin.';
+    info.className = 'info';
+  }
+}
+
+function showError(msg){
+  const b = document.getElementById('errorBox');
+  b.textContent = '⚠ '+msg; b.style.display = 'block';
+}
+</script>
+</body>
+</html>
