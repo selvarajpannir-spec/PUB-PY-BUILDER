@@ -1,0 +1,79 @@
+# Keep only the last 5 workflow runs (artifacts removed with those runs).
+# Manual only: Actions → Cleanup → Run workflow
+
+name: Cleanup
+
+on:
+  workflow_dispatch:
+    inputs:
+      keep_latest:
+        description: "Number of most-recent workflow runs to KEEP"
+        required: false
+        default: "5"
+        type: string
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete old workflow runs (keep last N)
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const keepLatest = parseInt("${{ github.event.inputs.keep_latest || '5' }}", 10) || 5;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const currentRunId = context.runId;
+
+            core.info(`Repo: ${owner}/${repo}`);
+            core.info(`Keeping the ${keepLatest} most recent workflow run(s).`);
+
+            let page = 1;
+            let all = [];
+            while (true) {
+              const res = await github.rest.actions.listWorkflowRunsForRepo({
+                owner,
+                repo,
+                per_page: 100,
+                page
+              });
+              all = all.concat(res.data.workflow_runs);
+              if (res.data.workflow_runs.length < 100) break;
+              page++;
+              if (page > 50) break;
+            }
+
+            core.info(`Found ${all.length} workflow run(s).`);
+            all.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+            const toDelete = all
+              .slice(keepLatest)
+              .filter(run => run.id !== currentRunId);
+
+            let deleted = 0;
+            let failed = 0;
+
+            for (const run of toDelete) {
+              try {
+                await github.rest.actions.deleteWorkflowRun({
+                  owner,
+                  repo,
+                  run_id: run.id
+                });
+                deleted++;
+                core.info(
+                  `Deleted run #${run.run_number} id=${run.id} ` +
+                  `(${run.name}, ${run.conclusion || run.status}, ${run.created_at})`
+                );
+              } catch (e) {
+                failed++;
+                core.warning(`Failed to delete run ${run.id}: ${e.message}`);
+              }
+            }
+
+            core.info(`Done. Deleted=${deleted}, Failed=${failed}, Kept≈${Math.min(keepLatest, all.length)}`);
+            core.info("Deleting a run also removes its logs and artifacts.");
