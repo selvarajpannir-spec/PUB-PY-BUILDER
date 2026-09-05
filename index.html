@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+<title>Docs+</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; width: 100%; overflow-x: hidden; }
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: #f0f4f8; color: #1a202c;
+  min-height: 100%; display: flex; flex-direction: column;
+}
+.header {
+  background: linear-gradient(135deg, #1a365d, #2b6cb0);
+  color: white; padding: 12px 14px 0; flex-shrink: 0;
+}
+.header h1 { font-size: 18px; font-weight: 700; }
+.header p  { font-size: 12px; opacity: .85; margin-top: 2px; }
+.tabbar { display: flex; margin-top: 12px; }
+.tabbar a {
+  flex: 1; text-align: center; padding: 10px 8px;
+  color: rgba(255,255,255,.75); text-decoration: none;
+  font-size: 13px; font-weight: 600; border-bottom: 3px solid transparent;
+}
+.tabbar a.active { color: #fff; border-bottom-color: #fff; }
+.main-content {
+  flex: 1 1 auto; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding: 12px 0 32px;
+}
+.card {
+  background: white; border-radius: 12px; padding: 16px; margin: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+.card-title {
+  font-size: 13px; font-weight: 700; color: #2d3748;
+  margin-bottom: 12px; text-transform: uppercase; letter-spacing: .5px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.upload-btn {
+  display: flex; align-items: center; gap: 10px;
+  background: #ebf8ff; border: 2px dashed #90cdf4;
+  border-radius: 10px; padding: 14px; cursor: pointer;
+  width: 100%; margin-bottom: 10px; text-align: left;
+}
+.upload-btn.success { background: #f0fff4; border-color: #68d391; }
+.upload-btn.loading { background: #fffbeb; border-color: #f6e05e; }
+.upload-icon { font-size: 28px; flex-shrink: 0; }
+.upload-label { font-size: 14px; font-weight: 600; color: #2b6cb0; }
+.upload-sub { font-size: 11px; color: #718096; margin-top: 2px; }
+.upload-file { font-size: 11px; color: #38a169; font-weight: 600; margin-top: 2px; word-break: break-all; }
+.col-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.col-tag {
+  background: #ebf8ff; color: #2b6cb0; border: 1px solid #90cdf4;
+  border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 600;
+}
+.col-tag.matched { background: #f0fff4; color: #276749; border-color: #68d391; }
+.action-btn {
+  width: 100%; padding: 15px; border: none; border-radius: 12px;
+  font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 8px;
+}
+.action-btn.blue { background: linear-gradient(135deg, #2b6cb0, #1a365d); color: white; }
+.action-btn:disabled { background: #a0aec0; cursor: not-allowed; }
+.progress-wrap { margin-top: 12px; display: none; }
+.progress-bg { background: #e2e8f0; border-radius: 99px; height: 10px; overflow: hidden; }
+.progress-bar { height: 100%; background: linear-gradient(90deg, #2b6cb0, #48bb78); border-radius: 99px; width: 0%; transition: width .3s; }
+.progress-text { text-align: center; font-size: 12px; color: #4a5568; margin-top: 6px; }
+.analyse-wrap {
+  margin-top: 12px; display: none; background: #fffbeb;
+  border: 1px solid #f6e05e; border-radius: 10px; padding: 14px;
+}
+.analyse-wrap .progress-bg { background: #fefcbf; }
+.analyse-wrap .progress-bar {
+  background: linear-gradient(90deg, #d69e2e, #ecc94b); width: 30%;
+  animation: analysePulse 1.2s ease-in-out infinite;
+}
+@keyframes analysePulse {
+  0% { width: 20%; margin-left: 0; }
+  50% { width: 60%; margin-left: 20%; }
+  100% { width: 20%; margin-left: 80%; }
+}
+.analyse-text { text-align: center; font-size: 13px; color: #744210; font-weight: 600; margin-top: 8px; }
+.row-limit-warn {
+  display: none; margin-top: 10px; padding: 10px 12px;
+  background: #fffbeb; border: 1px solid #f6e05e; border-radius: 8px;
+  font-size: 12px; color: #744210; line-height: 1.45;
+}
+.limit-banner {
+  background: #ebf8ff; border: 1px solid #90cdf4; border-radius: 8px;
+  padding: 12px; margin: 12px; font-size: 12px; color: #2c5282; line-height: 1.5;
+}
+.limit-banner b { display: block; margin-bottom: 4px; color: #1a365d; }
+.info { font-size: 12px; color: #718096; margin-bottom: 10px; }
+.info.ready { color: #276749; font-weight: 600; }
+.error-box {
+  background: #fff5f5; border: 1px solid #feb2b2; border-radius: 8px;
+  padding: 12px; margin: 0 12px 12px; font-size: 12px; color: #c53030; display: none;
+}
+.wipe-btn {
+  background: #fff5f5; color: #c53030; border: 1px solid #feb2b2;
+  border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;
+}
+.note-box {
+  background: #fffbeb; border: 1px solid #f6e05e; border-radius: 8px;
+  padding: 12px; margin: 12px; font-size: 12px; color: #744210;
+}
+.note-box b { display: block; margin-bottom: 4px; }
+.section-title {
+  margin: 16px 12px 8px; font-size: 13px; font-weight: 700; color: #2d3748;
+}
+.toolbar {
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  margin: 0 12px 8px; font-size: 12px; color: #4a5568;
+}
+.table-wrap { margin: 0 12px 16px; overflow-x: auto; }
+table.data {
+  width: 100%; border-collapse: collapse; background: #fff;
+  box-shadow: 0 1px 6px rgba(0,0,0,.06); border-radius: 10px;
+  overflow: hidden; font-size: 12px;
+}
+table.data th, table.data td {
+  padding: 9px 8px; border-bottom: 1px solid #e2e8f0;
+  text-align: left; vertical-align: top;
+}
+table.data th { background: #2d3748; color: #fff; font-weight: 600; }
+table.data tr:nth-child(even) { background: #f7fafc; }
+.btn-sm {
+  padding: 6px 10px; border-radius: 8px; border: 1px solid #90cdf4;
+  background: #ebf8ff; color: #2b6cb0; font-size: 11px; font-weight: 700; cursor: pointer;
+}
+.btn-danger-sm {
+  padding: 6px 10px; border-radius: 8px; border: 1px solid #feb2b2;
+  background: #fff5f5; color: #c53030; font-size: 11px; font-weight: 700; cursor: pointer;
+}
+.hint { font-size: 11px; color: #718096; margin: 0 12px 8px; }
+@media (min-width: 600px) {
+  .card, .note-box, .error-box, .limit-banner { margin-left: 24px; margin-right: 24px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📄 Docs+</h1>
+  <p>Excel + Word Template → Perfect Bulk Document</p>
+  <div class="tabbar">
+    <a class="active" href="file:///android_asset/index.html">Generator</a>
+    <a href="file:///android_asset/analyser.html">Analyser</a>
+  </div>
+</div>
+
+<div class="main-content">
+
+  <div class="note-box">
+    <b>📌 Placeholder format: <code>{{COLUMN_NAME}}</code></b>
+    Example: <code>{{NAME}}</code> <code>{{SALARY}}</code> <code>{{PHOTO}}</code>
+  </div>
+
+  <div class="limit-banner">
+    <b>⚠️ Batch limit</b>
+    Each run processes up to <b>50 new rows</b>. Rows already generated (saved batches) are skipped.
+    Table 1 shows only the current run. Batch files (Table 2) stay until you delete them.
+  </div>
+
+  <div class="card">
+    <div class="card-title">📁 Upload Files</div>
+    <button class="upload-btn" id="excelBtn" onclick="pickExcel()">
+      <span class="upload-icon">📊</span>
+      <div>
+        <div class="upload-label">Select Excel File</div>
+        <div class="upload-sub">.xlsx — column headers in row 1</div>
+        <div class="upload-file" id="excelName">No file selected</div>
+      </div>
+    </button>
+    <button class="upload-btn" id="wordBtn" onclick="pickWord()">
+      <span class="upload-icon">📝</span>
+      <div>
+        <div class="upload-label">Select Word Template</div>
+        <div class="upload-sub">.docx — use {{ColumnName}} placeholders</div>
+        <div class="upload-file" id="wordName">No file selected</div>
+      </div>
+    </button>
+    <div class="analyse-wrap" id="analyseWrap">
+      <div class="progress-bg"><div class="progress-bar"></div></div>
+      <div class="analyse-text">⏳ Analysing files… Please wait</div>
+    </div>
+  </div>
+
+  <div class="card" id="colCard" style="display:none">
+    <div class="card-title">🔍 Analysis</div>
+    <div style="font-size:11px;color:#718096;margin-bottom:8px">
+      <span style="color:#276749">●</span> Green = matched in Word &nbsp;
+      <span style="color:#2b6cb0">●</span> Blue = Excel only
+    </div>
+    <div class="col-wrap" id="colTags"></div>
+    <div style="margin-top:10px;font-size:12px;color:#4a5568;font-weight:600" id="matchInfo"></div>
+    <div class="row-limit-warn" id="rowLimitWarn"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      ⚡ Generate
+      <button class="wipe-btn" onclick="confirmWipe()">🗑 Reset files</button>
+    </div>
+    <div class="info" id="readyInfo">Upload both files to begin.</div>
+    <button class="action-btn blue" id="genBtn" disabled onclick="startGenerate()">
+      🚀 Generate next batch (max 50 new rows)
+    </button>
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-bg"><div class="progress-bar" id="progressBar"></div></div>
+      <div class="progress-text" id="progressText">Processing...</div>
+    </div>
+  </div>
+
+  <!-- TABLE 1: current run only (no persist) -->
+  <div class="section-title">Table 1 — Current batch rows</div>
+  <p class="hint">Only this run. Cleared when the next batch starts. Not saved after exit.</p>
+  <div class="table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th style="width:40px">#</th>
+          <th>Key</th>
+          <th>Applied data</th>
+          <th style="width:70px">Status</th>
+          <th style="width:72px">Open</th>
+        </tr>
+      </thead>
+      <tbody id="currentBody">
+        <tr><td colspan="5" style="color:#718096">No current batch yet.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- TABLE 2: persistent batches -->
+  <div class="section-title">Table 2 — Saved batches</div>
+  <p class="hint">Persists offline until you delete. Download opens/saves the batch DOCX.</p>
+  <div class="toolbar">
+    <label><input type="checkbox" id="batchCheckAll" onchange="toggleBatchAll(this.checked)"/> Select all</label>
+    <button class="btn-danger-sm" onclick="deleteSelectedBatches()">🗑 Delete selected batches</button>
+    <span id="batchCount">0 batches</span>
+  </div>
+  <div class="table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th style="width:36px">☐</th>
+          <th>Batch</th>
+          <th>Rows / keys</th>
+          <th>File</th>
+          <th style="width:72px">Download</th>
+        </tr>
+      </thead>
+      <tbody id="batchBody">
+        <tr><td colspan="5" style="color:#718096">No batches yet.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="error-box" id="errorBox"></div>
+</div>
+
+<script>
+const MAX_ROWS = 50;
+const BATCH_KEY = 'docsplus_generator_batches_v1';
+const DONE_KEY  = 'docsplus_generator_done_keys_v1';
+
+let excelReady = false;
+let wordReady  = false;
+let isGenerating = false;
+let isAnalysing  = false;
+let allExcelRows = []; // {row, key, summary}
+let currentRows = [];  // this run only
+let batches = [];      // persistent
+let doneKeys = {};     // key -> true
+
+function loadPersist() {
+  try {
+    batches = JSON.parse(localStorage.getItem(BATCH_KEY) || '[]');
+    if (!Array.isArray(batches)) batches = [];
+  } catch (e) { batches = []; }
+  try {
+    var d = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+    doneKeys = d && typeof d === 'object' ? d : {};
+  } catch (e) { doneKeys = {}; }
+}
+
+function saveBatches() {
+  try { localStorage.setItem(BATCH_KEY, JSON.stringify(batches)); } catch (e) {}
+}
+function saveDoneKeys() {
+  try { localStorage.setItem(DONE_KEY, JSON.stringify(doneKeys)); } catch (e) {}
+}
+
+function pickExcel(){ if (typeof AppBridge !== 'undefined') AppBridge.pickExcelFile(); }
+function pickWord(){ if (typeof AppBridge !== 'undefined') AppBridge.pickWordFile(); }
+
+function onExcelReady(ok, uri) {
+  if (!ok) { showError('Failed to read Excel file'); return; }
+  document.getElementById('excelName').textContent = '✓ ' + nameFromUri(uri);
+  document.getElementById('excelBtn').classList.add('loading');
+  excelReady = true;
+  tryAnalyse();
+}
+function onWordReady(ok, uri) {
+  if (!ok) { showError('Failed to read Word file'); return; }
+  document.getElementById('wordName').textContent = '✓ ' + nameFromUri(uri);
+  document.getElementById('wordBtn').classList.add('loading');
+  wordReady = true;
+  tryAnalyse();
+}
+function nameFromUri(uri) {
+  try {
+    return decodeURIComponent(uri.split('/').pop()).split('%2F').pop();
+  } catch (e) { return 'file'; }
+}
+
+function tryAnalyse() {
+  if (!excelReady || !wordReady || isAnalysing) return;
+  isAnalysing = true;
+  document.getElementById('analyseWrap').style.display = 'block';
+  document.getElementById('errorBox').style.display = 'none';
+  document.getElementById('readyInfo').textContent = 'Analysing files…';
+  document.getElementById('genBtn').disabled = true;
+
+  setTimeout(function () {
+    try {
+      var raw = AppBridge.analyseFiles();
+      var data = JSON.parse(raw);
+      document.getElementById('analyseWrap').style.display = 'none';
+      isAnalysing = false;
+      if (data.error) { showError(data.error); return; }
+
+      var cols = data.columns || [];
+      var rows = data.rows || 0;
+      var holders = data.placeholders || [];
+
+      document.getElementById('excelName').textContent = '✓ ' + rows + ' rows, ' + cols.length + ' columns';
+      document.getElementById('excelBtn').classList.remove('loading');
+      document.getElementById('excelBtn').classList.add('success');
+      document.getElementById('wordBtn').classList.remove('loading');
+      document.getElementById('wordBtn').classList.add('success');
+
+      var wrap = document.getElementById('colTags');
+      wrap.innerHTML = '';
+      var matched = 0;
+      cols.forEach(function (col) {
+        var inWord = holders.indexOf(col) !== -1;
+        if (inWord) matched++;
+        var tag = document.createElement('span');
+        tag.className = 'col-tag' + (inWord ? ' matched' : '');
+        tag.textContent = '{{' + col + '}}';
+        wrap.appendChild(tag);
+      });
+      document.getElementById('colCard').style.display = 'block';
+
+      // Load full row list for skip logic
+      allExcelRows = [];
+      try {
+        var lr = AppBridge.listExcelRows();
+        var parsed = JSON.parse(lr);
+        if (Array.isArray(parsed)) allExcelRows = parsed;
+      } catch (e) {}
+
+      var pending = 0;
+      for (var i = 0; i < allExcelRows.length; i++) {
+        if (!doneKeys[allExcelRows[i].key]) pending++;
+      }
+      var will = Math.min(pending, MAX_ROWS);
+      document.getElementById('matchInfo').textContent =
+        matched + ' of ' + cols.length + ' columns matched · ' +
+        pending + ' row(s) not yet generated · next run up to ' + will;
+
+      var warn = document.getElementById('rowLimitWarn');
+      if (pending > MAX_ROWS) {
+        warn.style.display = 'block';
+        warn.textContent = '⚠️ ' + pending + ' remaining. This run will do the next ' + MAX_ROWS + ' only.';
+      } else {
+        warn.style.display = 'none';
+      }
+
+      document.getElementById('readyInfo').textContent =
+        pending === 0
+          ? '✓ All rows already generated (see batches). Delete a batch to redo.'
+          : '✓ Ready — up to ' + will + ' new document(s) this run';
+      document.getElementById('readyInfo').className = 'info ready';
+      document.getElementById('genBtn').disabled = pending === 0;
+    } catch (e) {
+      document.getElementById('analyseWrap').style.display = 'none';
+      isAnalysing = false;
+      showError('Analysis error: ' + e.message);
+    }
+  }, 80);
+}
+
+function renderCurrentTable() {
+  var tb = document.getElementById('currentBody');
+  if (!currentRows.length) {
+    tb.innerHTML = '<tr><td colspan="5" style="color:#718096">No current batch yet.</td></tr>';
+    return;
+  }
+  var html = '';
+  for (var i = 0; i < currentRows.length; i++) {
+    var r = currentRows[i];
+    var openBtn = r.path
+      ? '<button class="btn-sm" onclick="openRowFile(' + JSON.stringify(r.path) + ')">Open</button>'
+      : '<span style="color:#a0aec0">—</span>';
+    html += '<tr><td>' + (i + 1) + '</td><td><b>' + esc(r.key) + '</b></td><td>' +
+      esc(r.summary || '') + '</td><td>' + esc(r.status) + '</td><td>' + openBtn + '</td></tr>';
+  }
+  tb.innerHTML = html;
+}
+
+function openRowFile(path) {
+  if (!path) {
+    showError('No file path for this row (generation may have failed)');
+    return;
+  }
+  if (typeof AppBridge === 'undefined') {
+    showError('AppBridge missing');
+    return;
+  }
+  try {
+    AppBridge.openAnalysedFile(path);
+  } catch (e) {
+    showError('Open failed: ' + (e.message || e));
+  }
+}
+
+function renderBatches() {
+  var tb = document.getElementById('batchBody');
+  document.getElementById('batchCount').textContent = batches.length + ' batch' + (batches.length === 1 ? '' : 'es');
+  if (!batches.length) {
+    tb.innerHTML = '<tr><td colspan="5" style="color:#718096">No batches yet.</td></tr>';
+    return;
+  }
+  var html = '';
+  for (var i = 0; i < batches.length; i++) {
+    var b = batches[i];
+    html += '<tr>' +
+      '<td><input type="checkbox" class="batch-check" data-id="' + esc(b.id) + '"/></td>' +
+      '<td><b>' + esc(b.label) + '</b><br><span style="color:#718096">' + esc(b.created || '') + '</span></td>' +
+      '<td>' + (b.count || 0) + ' docs<br><span style="color:#718096;font-size:11px">' + esc((b.keys || []).slice(0, 5).join(', ')) +
+        ((b.keys || []).length > 5 ? '…' : '') + '</span></td>' +
+      '<td style="word-break:break-all;font-size:11px">' + esc(b.fileName || '') + '</td>' +
+      '<td><button class="btn-sm" onclick="downloadBatch(' + JSON.stringify(b.path || '') + ')">⬇ Open</button></td>' +
+      '</tr>';
+  }
+  tb.innerHTML = html;
+}
+
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function startGenerate() {
+  if (isGenerating || typeof AppBridge === 'undefined') return;
+  isGenerating = true;
+  document.getElementById('genBtn').disabled = true;
+  document.getElementById('progressWrap').style.display = 'block';
+  document.getElementById('errorBox').style.display = 'none';
+
+  // Clear Table 1 for this new run
+  currentRows = [];
+  renderCurrentTable();
+
+  // Queue: not done, max 50
+  var queue = [];
+  for (var i = 0; i < allExcelRows.length; i++) {
+    var r = allExcelRows[i];
+    if (doneKeys[r.key]) continue;
+    queue.push(r);
+    if (queue.length >= MAX_ROWS) break;
+  }
+  if (!queue.length) {
+    document.getElementById('progressText').textContent = 'Nothing new to generate.';
+    isGenerating = false;
+    document.getElementById('genBtn').disabled = false;
+    return;
+  }
+
+  var tempPaths = [];
+  var doneInRun = [];
+  processGenQueue(queue, 0, tempPaths, doneInRun);
+}
+
+function processGenQueue(queue, index, tempPaths, doneInRun) {
+  if (index >= queue.length) {
+    finishBatch(tempPaths, doneInRun);
+    return;
+  }
+  var item = queue[index];
+  var pct = Math.round((index / queue.length) * 100);
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressText').textContent =
+    'Generating ' + (index + 1) + ' / ' + queue.length + ' — ' + item.key;
+
+  setTimeout(function () {
+    try {
+      var raw = AppBridge.generateOneRow(String(item.row));
+      // Expect OK:/path or ERROR:msg
+      if (raw.indexOf('OK:') === 0) {
+        var path = raw.substring(3);
+        tempPaths.push(path);
+        doneInRun.push(item.key);
+        currentRows.push({ key: item.key, summary: item.summary, status: 'Done', path: path });
+      } else {
+        currentRows.push({
+          key: item.key,
+          summary: item.summary,
+          status: 'Fail',
+          path: null
+        });
+        showError('Row failed (' + item.key + '): ' + raw);
+      }
+    } catch (e) {
+      currentRows.push({ key: item.key, summary: item.summary, status: 'Error', path: null });
+      showError('Row error (' + item.key + '): ' + (e.message || e));
+    }
+    renderCurrentTable();
+    processGenQueue(queue, index + 1, tempPaths, doneInRun);
+  }, 30);
+}
+
+function finishBatch(tempPaths, doneInRun) {
+  document.getElementById('progressBar').style.width = '100%';
+  if (!tempPaths.length) {
+    document.getElementById('progressText').textContent = 'No documents created.';
+    isGenerating = false;
+    document.getElementById('genBtn').disabled = false;
+    tryAnalyse();
+    return;
+  }
+  document.getElementById('progressText').textContent = 'Merging batch…';
+  try {
+    var mergeResult = AppBridge.mergeAndPublishBatch(JSON.stringify(tempPaths));
+    // OK:fileName|path  or ERROR:
+    if (mergeResult.indexOf('OK:') === 0) {
+      var rest = mergeResult.substring(3);
+      var parts = rest.split('|');
+      var fileName = parts[0] || 'batch.docx';
+      var path = parts[1] || '';
+      var batchNum = batches.length + 1;
+      var label = 'Batch ' + batchNum + ' (' + doneInRun.length + ' docs)';
+      batches.push({
+        id: 'b_' + Date.now(),
+        label: label,
+        count: doneInRun.length,
+        keys: doneInRun.slice(),
+        fileName: fileName,
+        path: path,
+        created: new Date().toLocaleString()
+      });
+      for (var i = 0; i < doneInRun.length; i++) doneKeys[doneInRun[i]] = true;
+      saveBatches();
+      saveDoneKeys();
+      renderBatches();
+      document.getElementById('progressText').textContent =
+        '✓ ' + label + ' saved to Downloads';
+      // Java mergeAndPublishBatch already shows Yes/No open dialog + toast
+      try { AppBridge.showToast('Batch saved to Downloads: ' + fileName); } catch (e2) {}
+    } else {
+      showError('Merge/publish failed: ' + mergeResult);
+      document.getElementById('progressText').textContent = 'Batch merge failed';
+      try { AppBridge.showToast('Batch failed: ' + mergeResult); } catch (e3) {}
+    }
+  } catch (e) {
+    showError(String(e.message || e));
+    try { AppBridge.showToast('Batch error: ' + (e.message || e)); } catch (e4) {}
+  }
+  isGenerating = false;
+  document.getElementById('genBtn').disabled = false;
+  tryAnalyse();
+}
+
+function downloadBatch(path) {
+  if (!path) {
+    showError('No batch file path saved. Re-generate this batch or check Downloads.');
+    return;
+  }
+  if (typeof AppBridge === 'undefined') {
+    showError('AppBridge missing');
+    return;
+  }
+  try {
+    AppBridge.openAnalysedFile(path);
+  } catch (e) {
+    showError('Open batch failed: ' + (e.message || e));
+  }
+}
+
+function toggleBatchAll(on) {
+  var boxes = document.querySelectorAll('.batch-check');
+  for (var i = 0; i < boxes.length; i++) boxes[i].checked = on;
+}
+
+function deleteSelectedBatches() {
+  var boxes = document.querySelectorAll('.batch-check:checked');
+  if (!boxes.length) { showError('Select a batch'); return; }
+  if (!confirm('Delete ' + boxes.length + ' batch record(s)?')) return;
+  var also = confirm('Also delete the batch file(s) from storage?\nOK = yes, Cancel = records only');
+  var ids = {};
+  for (var i = 0; i < boxes.length; i++) ids[boxes[i].getAttribute('data-id')] = true;
+
+  var kept = [];
+  for (var j = 0; j < batches.length; j++) {
+    var b = batches[j];
+    if (ids[b.id]) {
+      // free done keys so rows can regenerate
+      var ks = b.keys || [];
+      for (var k = 0; k < ks.length; k++) delete doneKeys[ks[k]];
+      if (also && b.path && typeof AppBridge !== 'undefined') {
+        try { AppBridge.deleteStorageFile(b.path); } catch (e) {}
+      }
+    } else {
+      kept.push(b);
+    }
+  }
+  batches = kept;
+  saveBatches();
+  saveDoneKeys();
+  renderBatches();
+  tryAnalyse();
+}
+
+function confirmWipe() {
+  if (!confirm('Reset uploaded Excel/Word files? (Batches are kept)')) return;
+  if (typeof AppBridge !== 'undefined') AppBridge.clearFiles();
+  excelReady = wordReady = false;
+  allExcelRows = [];
+  currentRows = [];
+  renderCurrentTable();
+  ['excelBtn','wordBtn'].forEach(function (id) {
+    document.getElementById(id).classList.remove('success','loading');
+  });
+  document.getElementById('excelName').textContent = 'No file selected';
+  document.getElementById('wordName').textContent = 'No file selected';
+  document.getElementById('colCard').style.display = 'none';
+  document.getElementById('progressWrap').style.display = 'none';
+  document.getElementById('analyseWrap').style.display = 'none';
+  document.getElementById('genBtn').disabled = true;
+  document.getElementById('readyInfo').textContent = 'Upload both files to begin.';
+  document.getElementById('readyInfo').className = 'info';
+}
+
+function showError(msg) {
+  var b = document.getElementById('errorBox');
+  b.textContent = '⚠ ' + msg;
+  b.style.display = 'block';
+}
+
+loadPersist();
+renderBatches();
+renderCurrentTable();
+</script>
+</body>
+</html>
