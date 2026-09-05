@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+<title>Document Analyser — Docs+</title>
+<style>
+
+:root {
+  /* Core — blue */
+  --core: var(--core);
+  --core-mid: var(--core-mid);
+  --core-light: var(--core-light);
+  --core-border: var(--core-border);
+
+  /* Content / pop-up — brown */
+  --content: var(--content);
+  --content-mid: #975a16;
+  --content-bg: #fffaf0;
+  --content-border: var(--wait);
+
+  /* Waiting / loading — yellow */
+  --wait: var(--wait);
+  --wait-dark: #975a16;
+  --wait-bg: #fffff0;
+  --wait-border: #ecc94b;
+
+  /* Error — red */
+  --error: var(--error);
+  --error-bg: var(--error-bg);
+  --error-border: var(--error-border);
+
+  /* Success / open — green */
+  --ok: var(--ok);
+  --ok-mid: #38a169;
+  --ok-bg: var(--ok-bg);
+  --ok-border: var(--ok-border);
+
+  /* Neutrals */
+  --page-bg: #f0f4f8;
+  --card: #ffffff;
+  --text: #1a202c;
+  --muted: #718096;
+  --line: #e2e8f0;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; width: 100%; overflow-x: hidden; }
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: #f0f4f8; color: #1a202c;
+  display: flex; flex-direction: column; min-height: 100%;
+}
+.header {
+  background: linear-gradient(135deg, var(--core), var(--core-mid));
+  color: #fff; padding: 12px 14px 0; flex-shrink: 0;
+}
+.header h1 { font-size: 18px; font-weight: 700; }
+.header p { font-size: 12px; opacity: .85; margin-top: 2px; }
+.tabbar {
+  display: flex; gap: 0; margin-top: 12px;
+}
+.tabbar a {
+  flex: 1; text-align: center; padding: 10px 8px;
+  color: rgba(255,255,255,.75); text-decoration: none;
+  font-size: 13px; font-weight: 600;
+  border-bottom: 3px solid transparent;
+}
+.tabbar a.active {
+  color: #fff; border-bottom-color: #fff;
+}
+.main { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 28px; }
+.card {
+  background: #fff; border-radius: 12px; padding: 14px;
+  margin: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.07);
+}
+.card-title {
+  font-size: 12px; font-weight: 700; color: #2d3748;
+  text-transform: uppercase; letter-spacing: .4px; margin-bottom: 8px;
+}
+.intro {
+  font-size: 13px; color: #4a5568; line-height: 1.5;
+}
+.intro ol { padding-left: 18px; margin-top: 6px; }
+.intro li { margin-bottom: 4px; }
+.folder-line {
+  font-size: 12px; color: var(--core-mid); word-break: break-all;
+  background: var(--core-light); border: 1px solid var(--core-border); border-radius: 8px;
+  padding: 8px 10px; margin: 8px 0;
+}
+.btn {
+  width: 100%; padding: 13px; border: none; border-radius: 11px;
+  font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 8px;
+}
+.btn.primary { background: linear-gradient(135deg, var(--core-mid), var(--core)); color: #fff; }
+.btn.secondary { background: #edf2f7; color: #2d3748; }
+.btn.danger { background: var(--error-bg); color: var(--error); border: 1px solid var(--error-border); }
+.btn:disabled { opacity: .55; cursor: not-allowed; }
+.status {
+  margin-top: 10px; font-size: 12px; color: #4a5568; min-height: 16px;
+}
+.progress {
+  margin-top: 8px; height: 8px; background: #e2e8f0; border-radius: 99px;
+  overflow: hidden; display: none;
+}
+.progress.on { display: block; }
+.progress > i {
+  display: block; height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--core-mid), #48bb78);
+  transition: width .25s;
+}
+.toolbar {
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  margin: 0 12px 8px; font-size: 12px;
+}
+.toolbar label { display: flex; align-items: center; gap: 6px; color: #4a5568; }
+.table-wrap { margin: 0 12px 16px; overflow-x: auto; }
+table {
+  width: 100%; border-collapse: collapse; background: #fff;
+  box-shadow: 0 1px 6px rgba(0,0,0,.06); border-radius: 10px;
+  overflow: hidden; font-size: 12px;
+}
+th, td {
+  padding: 10px 8px; border-bottom: 1px solid #e2e8f0;
+  text-align: left; vertical-align: top;
+}
+th { background: #2d3748; color: #fff; font-weight: 600; }
+tr:nth-child(even) { background: #f7fafc; }
+.fname { font-weight: 700; color: var(--core); word-break: break-all; max-width: 120px; }
+.note { color: #2d3748; line-height: 1.4; min-width: 160px; }
+.tags { margin-top: 6px; }
+.tag {
+  display: inline-block; background: var(--core-light); color: var(--core-mid);
+  border: 1px solid var(--core-border); border-radius: 12px;
+  padding: 1px 8px; margin: 2px 2px 0 0; font-size: 10px; font-weight: 600;
+}
+.open-btn {
+  padding: 6px 10px; border-radius: 8px; border: 1px solid var(--core-border);
+  background: var(--core-light); color: var(--core-mid); font-size: 11px; font-weight: 700;
+  cursor: pointer; white-space: nowrap;
+}
+.empty {
+  margin: 12px; padding: 14px; background: var(--wait-bg); border: 1px solid var(--wait-border);
+  border-radius: 10px; font-size: 13px; color: var(--content);
+}
+.error {
+  margin: 8px 12px; padding: 10px; background: var(--error-bg); border: 1px solid var(--error-border);
+  border-radius: 8px; color: var(--error); font-size: 12px; display: none;
+}
+.error.on { display: block; }
+.hint { font-size: 11px; color: #718096; margin-top: 6px; }
+@media (min-width: 700px) {
+  .fname { max-width: 220px; }
+}
+
+/* ── App icon loader ── */
+.app-loader-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(240, 244, 248, 0.88);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+}
+.app-loader-overlay.on {
+  display: flex;
+}
+.app-loader-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  object-fit: contain;
+  animation: iconPulse 1.1s ease-in-out infinite;
+  box-shadow: 0 4px 16px rgba(26, 54, 93, 0.2);
+}
+.app-loader-icon.spin {
+  animation: iconSpin 1.2s linear infinite;
+}
+.app-loader-msg {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--core);
+  text-align: center;
+  max-width: 80%;
+}
+.app-loader-inline {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: var(--core-light);
+  border: 1px solid var(--core-border);
+  border-radius: 10px;
+}
+.app-loader-inline.on {
+  display: flex;
+}
+.app-loader-inline img {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  animation: iconPulse 1.1s ease-in-out infinite;
+}
+.app-loader-inline span {
+  font-size: 13px;
+  font-weight: 600;
+  color: #2c5282;
+}
+@keyframes iconPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.08); opacity: 0.85; }
+}
+@keyframes iconSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+</style>
+</head>
+<body>
+
+<div class="app-loader-overlay" id="appLoader" aria-live="polite">
+  <img class="app-loader-icon spin" src="file:///android_asset/icon.png" alt=""
+       onerror="this.style.display='none'"/>
+  <div class="app-loader-msg" id="appLoaderMsg">Please wait…</div>
+</div>
+
+
+<div class="header">
+  <h1>📂 Document Analyser</h1>
+  <p>Notes for messy files — offline, no AI</p>
+  <div class="tabbar">
+    <a href="file:///android_asset/index.html">Generator</a>
+    <a class="active" href="file:///android_asset/analyser.html">Analyser</a>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- INTRO -->
+  <div class="card" id="introCard">
+    <div class="card-title">How to use</div>
+    <div class="intro">
+      <ol>
+        <li>Tap <b>Choose folder</b> and pick any folder (e.g. Download). Uses Android safe access (no all-files permission).</li>
+        <li>Tap <b>Scan</b>. Up to <b>50 new</b> files are analysed this run.</li>
+        <li>Files already listed by <b>name</b> are skipped.</li>
+        <li>Rows appear <b>one by one</b> as each file finishes.</li>
+        <li>Table has <b>no size limit</b> — it grows until you delete.</li>
+        <li>Use checkboxes to delete records; optionally delete the file on storage.</li>
+      </ol>
+      <p class="hint">Types: pdf, txt, md, xlsx, docx · Notes = short preview + up to 5 tags</p>
+    </div>
+  </div>
+
+  <!-- SCAN CONTROLS -->
+  <div class="card">
+    <div class="card-title">Scan</div>
+    <div class="folder-line" id="folderLabel">Folder: (none selected — tap Choose folder)</div>
+    <button class="btn secondary" id="folderBtn" onclick="chooseFolder()">📁 Choose folder</button>
+    <button class="btn primary" id="scanBtn" onclick="startScan()">🔍 Scan (max 50 new files)</button>
+    <div class="progress" id="progress"><i id="progressBar"></i></div>
+    <div id="scanInlineLoader" class="app-loader-inline">
+      <img src="file:///android_asset/icon.png" alt="" onerror="this.style.display='none'"/>
+      <span>Finding keywords…</span>
+    </div>
+    <div class="status" id="status">Ready.</div>
+  </div>
+
+  <div class="error" id="errorBox"></div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <label><input type="checkbox" id="checkAll" onchange="toggleAll(this.checked)"/> Select all</label>
+    <span id="countLabel">0 rows</span>
+    <button class="btn danger" style="width:auto;padding:8px 12px;margin:0" onclick="deleteSelected()">🗑 Delete selected</button>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:36px">☐</th>
+          <th>File</th>
+          <th>Notes</th>
+          <th style="width:64px">Open</th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+      </tbody>
+    </table>
+  </div>
+  <div class="empty" id="emptyBox" style="display:none">No records yet. Run a scan to add rows.</div>
+
+</div>
+
+<script>
+
+function showAppLoader(msg) {
+  var el = document.getElementById('appLoader');
+  var m = document.getElementById('appLoaderMsg');
+  if (m) m.textContent = msg || 'Please wait…';
+  if (el) el.classList.add('on');
+}
+function hideAppLoader() {
+  var el = document.getElementById('appLoader');
+  if (el) el.classList.remove('on');
+}
+function showInlineLoader(id, msg) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  var span = el.querySelector('span');
+  if (span && msg) span.textContent = msg;
+  el.classList.add('on');
+}
+function hideInlineLoader(id) {
+  var el = document.getElementById(id);
+  if (el) el.classList.remove('on');
+}
+
+/* ═══════════════ Config & storage ═══════════════ */
+var MAX_SCAN = 50;
+var STORAGE_KEY = 'docsplus_analyser_rows_v1';
+var rows = [];           // { id, name, path, preview, tags, note, ok }
+var folderPath = '';     // set by Java
+var scanning = false;
+
+function loadRows() {
+  try {
+    var raw = localStorage.getItem(STORAGE_KEY);
+    rows = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(rows)) rows = [];
+  } catch (e) { rows = []; }
+}
+
+function saveRows() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(rows));
+  } catch (e) {}
+}
+
+function knownNames() {
+  var s = {};
+  for (var i = 0; i < rows.length; i++) s[rows[i].name.toLowerCase()] = true;
+  return s;
+}
+
+/* ═══════════════ Render ═══════════════ */
+function renderTable() {
+  var tb = document.getElementById('tbody');
+  var empty = document.getElementById('emptyBox');
+  document.getElementById('countLabel').textContent = rows.length + ' row' + (rows.length === 1 ? '' : 's');
+  document.getElementById('checkAll').checked = false;
+
+  if (!rows.length) {
+    tb.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  var html = '';
+  for (var i = 0; i < rows.length; i++) {
+    var r = rows[i];
+    var tags = (r.tags || []).map(function (t) {
+      return '<span class="tag">' + esc(t) + '</span>';
+    }).join('');
+    html += '<tr data-id="' + esc(r.id) + '">' +
+      '<td><input type="checkbox" class="row-check" data-id="' + esc(r.id) + '"/></td>' +
+      '<td class="fname">' + esc(r.name) + '</td>' +
+      '<td class="note">' + esc(r.preview || r.note || '') +
+        (tags ? '<div class="tags">' + tags + '</div>' : '') + '</td>' +
+      '<td><button type="button" class="open-btn an-open-btn" data-path="' + escapeAttr(r.path || '') + '">Open</button></td>' +
+      '</tr>';
+  }
+  tb.innerHTML = html;
+}
+
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function setStatus(msg) {
+  document.getElementById('status').textContent = msg;
+}
+
+function showError(msg) {
+  var b = document.getElementById('errorBox');
+  b.textContent = '⚠ ' + msg;
+  b.classList.add('on');
+}
+
+function clearError() {
+  document.getElementById('errorBox').classList.remove('on');
+}
+
+/* ═══════════════ Folder ═══════════════ */
+function chooseFolder() {
+  if (typeof AppBridge === 'undefined') {
+    showError('Open inside Docs+ app');
+    return;
+  }
+  try {
+    AppBridge.pickAnalyserFolder();
+  } catch (e) {
+    showError(String(e.message || e));
+  }
+}
+
+function onAnalyserFolderReady(label) {
+  folderPath = label || '';
+  document.getElementById('folderLabel').textContent = 'Folder: ' + (label || '(selected)');
+  setStatus('Folder ready. Tap Scan when you want to analyse.');
+  clearError();
+}
+
+function refreshFolderLabel() {
+  if (typeof AppBridge === 'undefined') return;
+  try {
+    var p = AppBridge.getAnalyserFolder();
+    if (p) {
+      folderPath = p;
+      document.getElementById('folderLabel').textContent = 'Folder: ' + p;
+    }
+  } catch (e) {}
+}
+
+/* ═══════════════ Scan (one-by-one, skip known, max 50 new) ═══════════════ */
+function startScan() {
+  if (scanning) return;
+  if (typeof AppBridge === 'undefined') {
+    showError('AppBridge missing — open in Docs+ app');
+    return;
+  }
+  clearError();
+  scanning = true;
+  document.getElementById('scanBtn').disabled = true;
+  document.getElementById('progress').classList.add('on');
+  document.getElementById('progressBar').style.width = '0%';
+  showAppLoader('Scanning folder & finding keywords…');
+  showInlineLoader('scanInlineLoader', 'Finding keywords…');
+  setStatus('Listing files…');
+
+  setTimeout(function () {
+    try {
+      var listRaw = AppBridge.listAnalyserFiles();
+      var list = JSON.parse(listRaw);
+      if (list.error) {
+        finishScan();
+        showError(list.error);
+        return;
+      }
+      var files = list.files || [];
+      var known = knownNames();
+      var queue = [];
+      for (var i = 0; i < files.length; i++) {
+        var f = files[i];
+        var n = (f.name || '').toLowerCase();
+        if (!n) continue;
+        if (known[n]) continue;          // already in table → leave it
+        queue.push(f);
+        if (queue.length >= MAX_SCAN) break;  // scan limit only
+      }
+
+      if (!queue.length) {
+        setStatus('No new files to analyse (already in table or folder empty).');
+        finishScan();
+        return;
+      }
+
+      setStatus('Queued ' + queue.length + ' new file(s). Analysing…');
+      processQueue(queue, 0);
+    } catch (e) {
+      finishScan();
+      showError(String(e.message || e));
+    }
+  }, 30);
+}
+
+function processQueue(queue, index) {
+  if (index >= queue.length) {
+    setStatus('Scan complete. Table has ' + rows.length + ' row(s).');
+    finishScan();
+    return;
+  }
+  var f = queue[index];
+  var pct = Math.round((index / queue.length) * 100);
+  document.getElementById('progressBar').style.width = pct + '%';
+  setStatus('Analysing ' + (index + 1) + ' / ' + queue.length + ' — ' + f.name);
+  showAppLoader('Keywords: ' + (index + 1) + '/' + queue.length + ' — ' + f.name);
+
+  setTimeout(function () {
+    try {
+      var raw = AppBridge.analyseOneFile(f.path);
+      var item = JSON.parse(raw);
+      // Append even if ok=false (show error note)
+      rows.push({
+        id: 'r_' + Date.now() + '_' + index,
+        name: item.name || f.name,
+        path: item.path || f.path,
+        preview: item.preview || item.note || '',
+        tags: item.tags || [],
+        note: item.note || '',
+        ok: !!item.ok
+      });
+      saveRows();
+      renderTable();
+    } catch (e) {
+      rows.push({
+        id: 'r_' + Date.now() + '_' + index,
+        name: f.name,
+        path: f.path,
+        preview: 'Error: ' + (e.message || e),
+        tags: [],
+        note: '',
+        ok: false
+      });
+      saveRows();
+      renderTable();
+    }
+    processQueue(queue, index + 1);
+  }, 20);
+}
+
+function finishScan() {
+  scanning = false;
+  document.getElementById('scanBtn').disabled = false;
+  document.getElementById('progressBar').style.width = '100%';
+  hideAppLoader();
+  hideInlineLoader('scanInlineLoader');
+  setTimeout(function () {
+    document.getElementById('progress').classList.remove('on');
+  }, 400);
+}
+
+function escapeAttr(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;').replace(/</g, '&lt;');
+}
+document.addEventListener('click', function (ev) {
+  var t = ev.target;
+  if (t && t.classList && t.classList.contains('an-open-btn')) {
+    ev.preventDefault();
+    openFile(t.getAttribute('data-path'));
+  }
+});
+/* ═══════════════ Open / delete ═══════════════ */
+function openFile(path) {
+  if (!path) {
+    showError('No path for this file. Scan again or check folder access.');
+    return;
+  }
+  if (typeof AppBridge === 'undefined' || !AppBridge.openAnalysedFile) {
+    showError('Open not available (AppBridge missing). Open this page inside Docs+.');
+    return;
+  }
+  try {
+    AppBridge.showToast && AppBridge.showToast('Opening file…');
+    AppBridge.openAnalysedFile(path);
+  } catch (e) {
+    showError('Open failed: ' + (e.message || e));
+  }
+}
+
+function toggleAll(on) {
+  var boxes = document.querySelectorAll('.row-check');
+  for (var i = 0; i < boxes.length; i++) boxes[i].checked = on;
+}
+
+function selectedIds() {
+  var ids = [];
+  var boxes = document.querySelectorAll('.row-check:checked');
+  for (var i = 0; i < boxes.length; i++) ids.push(boxes[i].getAttribute('data-id'));
+  return ids;
+}
+
+function deleteSelected() {
+  var ids = selectedIds();
+  if (!ids.length) {
+    showError('Select at least one row');
+    return;
+  }
+  var msg = 'Delete ' + ids.length + ' record(s) from the table?\n\n' +
+            'You can also remove the file(s) from phone storage.';
+  // Use AppBridge confirm if needed; browser confirm works in WebView
+  if (!confirm(msg)) return;
+
+  var alsoStorage = confirm(
+    'Also delete the actual file(s) from storage?\n\n' +
+    'OK = delete records + files\nCancel = delete records only'
+  );
+
+  var idset = {};
+  for (var i = 0; i < ids.length; i++) idset[ids[i]] = true;
+
+  var kept = [];
+  for (var j = 0; j < rows.length; j++) {
+    var r = rows[j];
+    if (idset[r.id]) {
+      if (alsoStorage && r.path && typeof AppBridge !== 'undefined') {
+        try { AppBridge.deleteStorageFile(r.path); } catch (e) {}
+      }
+    } else {
+      kept.push(r);
+    }
+  }
+  rows = kept;
+  saveRows();
+  renderTable();
+  setStatus('Deleted selected record(s).');
+  clearError();
+}
+
+/* ═══════════════ Init ═══════════════ */
+loadRows();
+renderTable();
+refreshFolderLabel();
+</script>
+</body>
+</html>

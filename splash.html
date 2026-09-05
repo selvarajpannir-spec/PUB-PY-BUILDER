@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+<title>Docs+ – Instructions</title>
+<style>
+
+:root {
+  /* Core — blue */
+  --core: #1a365d;
+  --core-mid: #2b6cb0;
+  --core-light: #ebf8ff;
+  --core-border: #90cdf4;
+
+  /* Content / pop-up — brown */
+  --content: #744210;
+  --content-mid: #975a16;
+  --content-bg: #fffaf0;
+  --content-border: #d69e2e;
+
+  /* Waiting / loading — yellow */
+  --wait: #d69e2e;
+  --wait-dark: #975a16;
+  --wait-bg: #fffff0;
+  --wait-border: #ecc94b;
+
+  /* Error — red */
+  --error: #c53030;
+  --error-bg: #fff5f5;
+  --error-border: #feb2b2;
+
+  /* Success / open — green */
+  --ok: #276749;
+  --ok-mid: #38a169;
+  --ok-bg: #f0fff4;
+  --ok-border: #68d391;
+
+  /* Neutrals */
+  --page-bg: #f0f4f8;
+  --card: #ffffff;
+  --text: #1a202c;
+  --muted: #718096;
+  --line: #e2e8f0;
+}
+
+:root {
+  --primary:     var(--core-mid, #2b6cb0);
+  --core: #1a365d;
+  --core-mid: #2b6cb0;
+  --content: #744210;
+  --content-bg: #fffaf0;
+  --content-border: #d69e2e;
+  --wait: #d69e2e;
+  --wait-bg: #fffff0;
+  --ok: #276749;
+  --ok-bg: #f0fff4;
+  --error: #c53030;
+  --error-bg: #fff5f5;
+  --primary-dark: var(--core, #1a365d);
+  --success:     var(--ok, #276749);
+  --danger:      var(--error, #c53030);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: #f0f4f8;
+  color: #1a202c;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  color: white;
+  padding: 24px 16px 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.header h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.header p  { font-size: 13px; opacity: .85; }
+
+.main-content {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px 0 48px;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 18px 16px;
+  margin: 0 12px 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.07);
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary-dark);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.step-num {
+  background: var(--primary);
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+p, li {
+  font-size: 13px;
+  line-height: 1.55;
+  color: #4a5568;
+}
+
+ul { padding-left: 18px; margin: 8px 0; }
+li { margin-bottom: 4px; }
+
+.sample-box {
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 10px;
+  overflow-x: auto;
+  font-size: 12px;
+}
+
+table.sample {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+table.sample th {
+  background: #ebf8ff;
+  color: var(--primary);
+  padding: 6px 10px;
+  text-align: left;
+  border: 1px solid #bee3f8;
+  font-weight: 600;
+}
+table.sample td {
+  padding: 6px 10px;
+  border: 1px solid #e2e8f0;
+  color: #2d3748;
+}
+
+.code {
+  font-family: ui-monospace, 'Cascadia Code', 'Courier New', monospace;
+  background: #edf2f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #2b6cb0;
+}
+
+.placeholder-examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.tag {
+  background: #ebf8ff;
+  color: var(--primary);
+  border: 1px solid #90cdf4;
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.output-box {
+  background: #f0fff4;
+  border: 1px solid #9ae6b4;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--success);
+}
+
+.disclaimer {
+  background: #fff5f5;
+  border: 1px solid #feb2b2;
+  border-radius: 10px;
+  padding: 16px;
+  margin: 0 12px 14px;
+}
+.disclaimer h3 {
+  font-size: 14px;
+  color: var(--danger);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.disclaimer ul {
+  padding-left: 18px;
+  margin: 0;
+}
+.disclaimer li {
+  font-size: 12.5px;
+  color: #742a2a;
+  margin-bottom: 6px;
+  line-height: 1.5;
+}
+
+.agree-section {
+  background: white;
+  border-radius: 12px;
+  padding: 18px 16px;
+  margin: 0 12px 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.07);
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+.checkbox-row input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  accent-color: var(--primary);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.checkbox-row label {
+  font-size: 13px;
+  color: #2d3748;
+  line-height: 1.45;
+  cursor: pointer;
+}
+
+.proceed-btn {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  transition: opacity .2s, transform .1s;
+}
+.proceed-btn:disabled {
+  background: #a0aec0;
+  cursor: not-allowed;
+  opacity: .7;
+}
+.proceed-btn:not(:disabled):active {
+  transform: scale(0.98);
+}
+
+.note {
+  font-size: 12px;
+  color: #718096;
+  text-align: center;
+  margin-top: 12px;
+}
+
+@media (min-width: 600px) {
+  .card, .disclaimer, .agree-section { margin-left: 24px; margin-right: 24px; }
+}
+@media (min-width: 900px) {
+  body { max-width: 720px; margin: 0 auto; }
+  .card, .disclaimer, .agree-section { margin-left: 32px; margin-right: 32px; }
+}
+
+/* ── App icon loader ── */
+.app-loader-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(240, 244, 248, 0.88);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+}
+.app-loader-overlay.on {
+  display: flex;
+}
+.app-loader-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  object-fit: contain;
+  animation: iconPulse 1.1s ease-in-out infinite;
+  box-shadow: 0 4px 16px rgba(26, 54, 93, 0.2);
+}
+.app-loader-icon.spin {
+  animation: iconSpin 1.2s linear infinite;
+}
+.app-loader-msg {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a365d;
+  text-align: center;
+  max-width: 80%;
+}
+.app-loader-inline {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: #ebf8ff;
+  border: 1px solid #90cdf4;
+  border-radius: 10px;
+}
+.app-loader-inline.on {
+  display: flex;
+}
+.app-loader-inline img {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  animation: iconPulse 1.1s ease-in-out infinite;
+}
+.app-loader-inline span {
+  font-size: 13px;
+  font-weight: 600;
+  color: #2c5282;
+}
+@keyframes iconPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.08); opacity: 0.85; }
+}
+@keyframes iconSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+
+/* ── Startup boot (3s icon → fade/flash → content) ── */
+#bootScreen {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--core, #1a365d);
+  transition: opacity 0.55s ease, background 0.55s ease;
+}
+#bootScreen.flash {
+  background: #ffffff;
+}
+#bootScreen.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+#bootScreen.gone {
+  display: none;
+}
+#bootIcon {
+  width: 33vmin;
+  height: 33vmin;
+  max-width: 33vw;
+  max-height: 33vh;
+  border-radius: 22%;
+  object-fit: contain;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+  animation: bootPulse 1.2s ease-in-out infinite;
+}
+#bootScreen.flash #bootIcon {
+  animation: none;
+  opacity: 0.15;
+  transition: opacity 0.4s ease;
+}
+@keyframes bootPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+#mainSplash {
+  opacity: 0;
+  transition: opacity 0.5s ease 0.1s;
+}
+#mainSplash.visible {
+  opacity: 1;
+}
+
+</style>
+</head>
+<body>
+
+<div id="bootScreen" aria-label="Starting Docs+">
+  <img id="bootIcon" src="file:///android_asset/icon.png" alt="Docs+"
+       onerror="this.style.background='#2b6cb0';this.style.width='33vmin';this.style.height='33vmin';"/>
+</div>
+
+<div id="mainSplash">
+
+
+<div class="app-loader-overlay" id="appLoader" aria-live="polite">
+  <img class="app-loader-icon spin" src="file:///android_asset/icon.png" alt=""
+       onerror="this.style.display='none'"/>
+  <div class="app-loader-msg" id="appLoaderMsg">Please wait…</div>
+</div>
+
+
+<div class="header">
+  <div style="text-align:center;padding:12px 0 4px"><img src="file:///android_asset/icon.png" width="64" height="64" style="border-radius:16px;animation:iconPulse 1.4s ease-in-out infinite;box-shadow:0 4px 14px rgba(26,54,93,.25)" alt="Docs+" onerror="this.style.display='none'"/></div>
+  <h1>📄 Docs+</h1>
+  <p>Excel + Word Template → Bulk Documents</p>
+</div>
+
+<div class="main-content">
+
+  <div class="card">
+    <div class="card-title">
+      <span class="step-num">1</span>
+      How your Excel sheet should look
+    </div>
+    <p>
+      Put column headers in the <strong>first row</strong>.  
+      Each following row becomes one generated document.
+    </p>
+    <div class="sample-box">
+      <table class="sample">
+        <thead>
+          <tr>
+            <th>NAME</th>
+            <th>EMP_ID</th>
+            <th>DEPARTMENT</th>
+            <th>SALARY</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Rahul Sharma</td>
+            <td>E1024</td>
+            <td>Sales</td>
+            <td>45000</td>
+          </tr>
+          <tr>
+            <td>Priya Patel</td>
+            <td>E1025</td>
+            <td>HR</td>
+            <td>52000</td>
+          </tr>
+          <tr>
+            <td>Amit Kumar</td>
+            <td>E1026</td>
+            <td>IT</td>
+            <td>61000</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top:10px">
+      Supported format: <span class="code">.xlsx</span>  
+      (First sheet is used automatically)
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <span class="step-num">2</span>
+      How your Word template should look
+    </div>
+    <p>
+      Create a normal <span class="code">.docx</span> file and insert placeholders  
+      using <strong>double curly braces</strong> that match your Excel column names:
+    </p>
+    <div class="placeholder-examples">
+      <span class="tag">{{NAME}}</span>
+      <span class="tag">{{EMP_ID}}</span>
+      <span class="tag">{{DEPARTMENT}}</span>
+      <span class="tag">{{SALARY}}</span>
+    </div>
+
+    <div class="sample-box" style="margin-top:12px; line-height:1.7; color:#2d3748;">
+      <strong>Sample Word content:</strong><br><br>
+      Date: {{DATE}}<br><br>
+      Dear {{NAME}},<br><br>
+      Employee ID: {{EMP_ID}}<br>
+      Department: {{DEPARTMENT}}<br>
+      Monthly Salary: ₹{{SALARY}}<br><br>
+      This letter confirms your employment details.<br><br>
+      Regards,<br>
+      HR Department
+    </div>
+    <p style="margin-top:10px">
+      The app replaces every <span class="code">{{COLUMN}}</span> with the matching value from each Excel row.
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <span class="step-num">3</span>
+      What output you will get
+    </div>
+    <p>
+      After generation you receive <strong>one combined Word document</strong>  
+      containing one page (or section) for every row in your Excel file.
+    </p>
+    <div class="output-box">
+      ✓ File saved to <strong>Downloads</strong> folder<br>
+      ✓ Named like <span class="code">generated_1723….docx</span><br>
+      ✓ You can open it in Microsoft Word, Google Docs, or WPS<br>
+      ✓ Then use <strong>Print → Save as PDF</strong> if you need a PDF
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <h3>⚠️ Disclaimer & Terms of Use</h3>
+    <ul>
+      <li>This application is intended for <strong>personal use only</strong>.</li>
+      <li>Any illegal modification of official documents may lead to legal action against the user.</li>
+      <li>The developer is <strong>not responsible</strong> for any content uploaded or generated by users.</li>
+      <li>We do <strong>not collect, store, or share</strong> any of your data.</li>
+      <li>All files remain only on your device storage. Nothing is sent to any server.</li>
+      <li>You are solely responsible for ensuring that the documents you create comply with applicable laws.</li>
+      <li>By using this app you agree that the developer bears no liability for misuse.</li>
+    </ul>
+  </div>
+
+  <div class="agree-section">
+    <div class="checkbox-row" onclick="toggleAgree(event)">
+      <input type="checkbox" id="agreeCheck" onchange="updateButton()">
+      <label for="agreeCheck">
+        I have read and understood the instructions and the Disclaimer &amp; Terms of Use.  
+        I agree to use this app only for personal and lawful purposes.
+      </label>
+    </div>
+
+    <button class="proceed-btn" id="proceedBtn" disabled onclick="proceed()">
+      Agree &amp; Proceed
+    </button>
+    <p class="note">You can change your mind later by clearing app data.</p>
+  </div>
+
+</div>
+
+<script>
+
+function showAppLoader(msg) {
+  var el = document.getElementById('appLoader');
+  var m = document.getElementById('appLoaderMsg');
+  if (m) m.textContent = msg || 'Please wait…';
+  if (el) el.classList.add('on');
+}
+function hideAppLoader() {
+  var el = document.getElementById('appLoader');
+  if (el) el.classList.remove('on');
+}
+function showInlineLoader(id, msg) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  var span = el.querySelector('span');
+  if (span && msg) span.textContent = msg;
+  el.classList.add('on');
+}
+function hideInlineLoader(id) {
+  var el = document.getElementById(id);
+  if (el) el.classList.remove('on');
+}
+
+function toggleAgree(e) {
+  if (e.target.tagName !== 'INPUT') {
+    const cb = document.getElementById('agreeCheck');
+    cb.checked = !cb.checked;
+    updateButton();
+  }
+}
+
+function updateButton() {
+  const checked = document.getElementById('agreeCheck').checked;
+  document.getElementById('proceedBtn').disabled = !checked;
+}
+
+function proceed() {
+  window.location.href = 'index.html';
+}
+</script>
+</div><!-- /mainSplash -->
+<script>
+
+(function bootSequence() {
+  var boot = document.getElementById('bootScreen');
+  var main = document.getElementById('mainSplash');
+  if (!boot) return;
+  // Hold icon ~2.2s, flash ~0.4s, fade ~0.5s ≈ 3s total feel
+  setTimeout(function () {
+    boot.classList.add('flash');
+    setTimeout(function () {
+      boot.classList.add('fade-out');
+      if (main) main.classList.add('visible');
+      setTimeout(function () {
+        boot.classList.add('gone');
+        boot.remove();
+      }, 600);
+    }, 400);
+  }, 2200);
+})();
+
+</script>
+</body>
+</html>
