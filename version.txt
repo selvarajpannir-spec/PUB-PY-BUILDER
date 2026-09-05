@@ -1,5 +1,5 @@
 # Docs+ app version — CURRENT build numbers
 # Open this file before each GitHub Action run to see current values.
 # In the workflow form, enter the NEXT version (code must be higher).
-VERSION_NAME=1.4
+VERSION_NAME=1.5
 VERSION_CODE=4
